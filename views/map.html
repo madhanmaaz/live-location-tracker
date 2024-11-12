@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #000;
+            color: aliceblue;
+        }
+
+        h4 {
+            padding: .5rem;
+
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <h4>ID: <span id="display-id"></span></h4>
+    <div id="map"></div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/socket.io@4.8.1/client-dist/socket.io.min.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        const displayId = document.querySelector("#display-id")
+        const id = new URLSearchParams(location.search).get("id")
+        const latLng = JSON.parse(`{{ data }}`)
+        const map = L.map('map').setView(latLng, 12)
+        const marker = L.marker(latLng).addTo(map)
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map)
+
+        const socket = io("", {
+            secure: true,
+            path: "/socket.io",
+            transports: ['websocket']
+        })
+
+        displayId.innerHTML = id
+        // on update
+        socket.on("map-data", data => {
+            if (data.id == id) {
+                displayId.innerHTML = `${id} - updating`
+                marker.setLatLng([data.lat, data.lng])
+                map.setView([data.lat, data.lng])
+
+                setTimeout(() => {
+                    displayId.innerHTML = id
+                }, 2000)
+            }
+        })
+    </script>
+</body>
+
+</html>

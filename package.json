@@ -1,0 +1,19 @@
+{
+  "name": "live-location-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node .",
+    "dev": "nodemon -e .html,.js ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cloudflared": "^0.5.3",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.1",
+    "socket.io": "^4.8.1",
+    "tarkine": "^0.0.2"
+  }
+}
