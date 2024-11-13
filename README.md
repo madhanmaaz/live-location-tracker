@@ -22,3 +22,9 @@ npm install
 ```bash
 npm start
 ```
+
+4. Login credentials
+```js
+username: admin
+password: admin
+```
