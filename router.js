@@ -29,6 +29,7 @@ router.route("/weather").get((req, res) => {
     TARGETS[id] = [lat, lng]
     IO.emit("map-data", { id, lat, lng })
     res.send("OK")
+    console.log(`> ${id} - ${TARGETS[id]}`)
 })
 
 // token checking

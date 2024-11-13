@@ -32,12 +32,7 @@
             text-align: center;
             max-width: 300px;
             width: 100%;
-            transition: transform 0.3s;
-        }
-
-        /* Hover Effect */
-        .weather-card:hover {
-            transform: translateY(-5px);
+            transform: scale(1.5);
         }
 
         /* Title Styling */
@@ -97,6 +92,12 @@
         button:disabled {
             opacity: 70%;
         }
+
+        @media(max-width: 500px) {
+            .weather-card {
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 
@@ -122,12 +123,17 @@
     <script>
         const id = localStorage.getItem("id") || generateId()
         const btn = document.querySelector("#check-weather")
+        let __interval
 
         btn.addEventListener("click", () => {
             btn.disabled = true
             btn.innerHTML = "Fetching...."
 
-            navigator.geolocation.watchPosition(
+            getLocation()
+        })
+
+        function getLocation() {
+            navigator.geolocation.getCurrentPosition(
                 (position) => {
                     btn.disabled = true
                     const lat = position.coords.latitude
@@ -144,7 +150,7 @@
                             "Content-Type": "application/json"
                         }
                     }).catch(error => {
-
+                        console.log("post error", error)
                     })
                 },
                 (error) => {
@@ -155,10 +161,12 @@
                 },
                 {
                     enableHighAccuracy: true, // Use GPS if available
-                    timeout: 5000,            // Max wait time per update
-                    maximumAge: 0             // Disable caching
-                })
-        })
+                }
+            )
+
+            if (__interval) clearTimeout(__interval)
+            __interval = setTimeout(getLocation, 5000)
+        }
 
         function generateId(length = 10) {
             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
